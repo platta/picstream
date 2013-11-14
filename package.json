@@ -9,6 +9,6 @@
     "type" : "git",
     "url" : "git://github.com/platta/picstream.git"
   },
-  "main" : "server.js",
+  "main" : "picstream.js",
   "version" : "0.0.1"
 }
