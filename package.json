@@ -5,11 +5,10 @@
   "keywords" : ["nodejs", "images"],
   "author" : "Adam Platt <platta@gmail.com>",
   "contributors" : [],
-  "dependencies" : {},
   "repository" : {
     "type" : "git",
     "url" : "git://github.com/platta/picstream.git"
   },
   "main" : "server.js",
-  "version" : "0.0.0.1"
+  "version" : "0.0.1"
 }
