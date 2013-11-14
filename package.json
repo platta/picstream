@@ -10,6 +10,6 @@
     "url" : "git://github.com/platta/picstream.git"
   },
   "main" : "picstream.js",
-  "scripts": {"start": "node picstream.js"}
+  "scripts": {"start": "node picstream.js"},
   "version" : "0.0.1"
 }
