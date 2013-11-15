@@ -1,8 +1,22 @@
-var http = require('http');
-
+// Azure port handling
 var port = process.env.PORT || 8000;
 
-http.createServer(function(req, res) {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end('Hello World\n');
-}).listen(port);
+// Set up express erver and socket.io
+var express = require('express'),
+    app = express(),
+    http = require('http'),
+    server = http.createServer(app),
+    io = require('socket.io').listen(server),
+    util = require('util');
+
+// Bring in social media modules
+var twitterModule = require('./modules/twitterModule');
+
+
+// Static web components served from here
+app.use(express.static(__dirname + '/public'));
+
+// Enable console logging if desired.
+//app.use(express.logger());
+
+server.listen(port);
