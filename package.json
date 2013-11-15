@@ -3,13 +3,14 @@
   "description" : "A Node.js application to stream pictures in real time from social media services.",
   "homepage" : "https://github.com/platta/picstream",
   "keywords" : ["nodejs", "images"],
-  "author" : "Adam Platt <platta@gmail.com>",
+  "author" : "Adam Platt <platta@gmail.com> (http://www.plattsoft.net)",
   "contributors" : [],
+  "dependencies": {
+    "express": ">=3.4.4"
+  }
   "repository" : {
     "type" : "git",
     "url" : "git://github.com/platta/picstream.git"
   },
-  "main" : "picstream.js",
-  "scripts": {"start": "node picstream.js"},
   "version" : "0.0.1"
 }
