@@ -7,7 +7,7 @@
   "contributors" : [],
   "dependencies": {
     "express": ">=3.4.4"
-  }
+  },
   "repository" : {
     "type" : "git",
     "url" : "git://github.com/platta/picstream.git"
