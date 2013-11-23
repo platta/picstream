@@ -6,6 +6,7 @@
     this.currentSlide = null;
     this.slideIndex = 0;
     this.active = false;
+    this.animating = false;
     
     this.settings = $.extend($.fn.dynamicCarousel.defaults, options);
   }
@@ -40,6 +41,7 @@
     var nextSlide = this.slides[this.slideIndex]
     if (currentSlide != nextSlide) {
       // Call transition
+      this.animating = true;
       $.fn.dynamicCarousel.transitions[this.settings.transition].call(this, this.container, currentSlide, nextSlide);
       this.currentSlide = nextSlide;
     }
@@ -56,9 +58,12 @@
     this.slides.push(slide);
     
     if (this.settings.maxSlides > 0 && this.slides.length > this.settings.maxSlides) {
-      if (this.slideIndex > 0) {
-        this.slideIndex--;
+      if (this.slideIndex > 0 && !this.animating || this.slideIndex > 1) {
         this.slides[0].remove();
+      }
+      
+      if (this.slideIndex >= 0) {
+        this.slideIndex--;
       }
 
       this.slides = this.slides.slice(1);
@@ -66,6 +71,7 @@
   }
   
   DynamicCarousel.prototype.slideHidden = function(slide) {
+    this.animating = false;
     if ($.inArray(slide, this.slides) === -1) {
       slide.remove();
     }
