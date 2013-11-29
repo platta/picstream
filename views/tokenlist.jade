@@ -1,0 +1,28 @@
+extends layout
+
+block content
+	h1= title
+	br
+	
+	form(action="/tokenlist/deletetoken", method="post")
+		table.table.table-striped.table-bordered
+			tr
+				th Name
+				th Token
+				th
+			each token in tokens
+				tr
+					td #{token.name}
+					td #{token.token}
+					td
+						button.btn(type="submit" name="#{token.RowKey}" value="true") Delete
+	
+	hr
+	
+	form.well(action="/tokenlist/addtoken", method="post")
+		label Item Name:
+		input(name="item[name]", type="textbox")
+		label Item Token:
+		input(name="item[token]", type="textbox")
+		br
+		button.btn(type="submit") Add item
