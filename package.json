@@ -1,5 +1,5 @@
 {
-  "name": "picstream",
+  "name": "application-name",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -8,10 +8,6 @@
   "dependencies": {
     "express": "3.4.5",
     "jade": "*",
-    "less-middleware": "*",
-    "async": "~0.2.9",
-    "node-uuid": "~1.4.1",
-    "nconf": "~0.6.8",
-    "azure": "~0.7.18"
+    "less-middleware": "*"
   }
 }
