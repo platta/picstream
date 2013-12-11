@@ -8,6 +8,9 @@
   "dependencies": {
     "express": "3.4.5",
     "jade": "*",
-    "less-middleware": "*"
+    "less-middleware": "*",
+    "node-uuid": "~1.4.1",
+    "nconf": "~0.6.9",
+    "azure": "~0.7.18"
   }
 }

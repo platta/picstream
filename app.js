@@ -7,6 +7,13 @@ var express = require('express');
 var http = require('http');
 var path = require('path');
 
+var nconf = require('nconf');
+nconf.env().file({file: 'config.json'});
+
+var config = {};
+config.title = nconf.get("TITLE");
+config.storage_key = nconf.get("STORAGE_KEY");
+
 var app = express();
 
 // all environments
