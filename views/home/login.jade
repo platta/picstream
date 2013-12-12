@@ -1,0 +1,14 @@
+extends ../layout
+
+block content
+  div.well.col-md-4
+    h2 Login
+    form(action="/login", method="post")
+      div.form-group
+        label(for="username") Username:
+        input.form-control(type="text", name="username" placeholder="Username")
+      div.form-group
+        label(for="password") Password:
+        input.form-control(type="password", name="password" placeholder="Password")
+      div.form-group
+        button.btn.btn-primary(type="submit", name="submit") Login

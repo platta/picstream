@@ -9,7 +9,28 @@ html
     div.container
       nav.navbar.navbar-default(role='navigation')
         div.navbar-header
-          a(class='navbar-brand' href='#')= title
+          button.navbar-toggle(type="button" data-toggle="collapse" data-target="#navbar-collapse")
+            span.sr-only Toggle navigation
+            span.icon-bar
+            span.icon-bar
+            span.icon-bar
+          a(class='navbar-brand' href='/')= title
+        
+        #navbar-collapse.collapse.navbar-collapse
+          if !hideHeaderLogin
+            if user
+              form.navbar-form.navbar-right(action="/logout", method="get")
+                button.btn.btn-default(type="submit") Logout
+              p.navbar-text.navbar-right Logged in as 
+                a(href="/user") #{user.username}
+                .
+            else
+              form.navbar-form.navbar-right(action="/login", method="post")
+                div.form-group
+                  input.form-control(type="text", placeholder="Username", name="username")
+                div.form-group
+                  input.form-control(type="password", placeholder="Password", name="password")
+                button.btn.btn-default(type="submit") Login
       block content
     script(type='text/javascript', src='/js/jquery-1.10.2.min.js')
     script(type='text/javascript', src='/bootstrap/js/bootstrap.min.js')

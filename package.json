@@ -11,6 +11,10 @@
     "less-middleware": "*",
     "node-uuid": "~1.4.1",
     "nconf": "~0.6.9",
-    "azure": "~0.7.18"
+    "azure": "~0.7.18",
+    "passport-local": "~0.1.6",
+    "passport": "~0.1.17",
+    "passport-instagram": "~0.1.2",
+    "passport-twitter": "~1.0.2"
   }
 }
