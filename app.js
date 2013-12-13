@@ -193,7 +193,7 @@ app.use(express.json());
 app.use(express.urlencoded());
 app.use(express.methodOverride());
 app.use(express.cookieParser('your secret here'));
-app.use(express.session());
+app.use(express.session()); // TODO: Default session provider gives a memory leak warning - look into using something else for Azure/Production
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(app.router);
