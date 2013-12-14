@@ -1,11 +1,13 @@
 doctype 5
 html
   head
-    title= title
+    title= config.title
     
     link(rel='stylesheet', href='/bootstrap/css/bootstrap.min.css')
     link(rel='stylesheet', href='/css/style.css')
+    block css
   body
+    input#root-url(type="hidden" value=config.root_url)
     div.container
       nav.navbar.navbar-default(role='navigation')
         div.navbar-header
@@ -14,7 +16,7 @@ html
             span.icon-bar
             span.icon-bar
             span.icon-bar
-          a(class='navbar-brand' href='/')= title
+          a(class='navbar-brand' href='/')= config.title
         
         #navbar-collapse.collapse.navbar-collapse
           if !hideHeaderLogin
@@ -34,3 +36,4 @@ html
       block content
     script(type='text/javascript', src='/js/jquery-1.10.2.min.js')
     script(type='text/javascript', src='/bootstrap/js/bootstrap.min.js')
+    block scripts

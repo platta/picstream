@@ -12,6 +12,7 @@ var passport = require('passport'),
   TwitterStrategy = require('passport-twitter').Strategy,
   InstagramStrategy = require('passport-instagram').Strategy;
 var nconf = require('nconf');
+var io = require('socket.io');
 
 /**
  * Load Configuration Values
@@ -186,6 +187,9 @@ app.use(app.router);
 app.use(require('less-middleware')({ src: path.join(__dirname, 'public') }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Load data into locals so all Jade templates can use it
+app.locals.config = config;
+
 // development only
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
@@ -243,9 +247,24 @@ app.post('/connect/instagram/remove', mustBeLoggedIn, function(req, res) {
   }
 });
 
+app.get('/socketio-test', mustBeLoggedIn, controllers.socketio.index);
+
 /**
  * Start server
  */
-http.createServer(app).listen(app.get('port'), function(){
+var server = http.createServer(app);
+io = io.listen(server);
+server.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
+});
+
+/**
+ * Socket.io logic
+ */
+io.sockets.on('connection', function(socket) {
+  var counter = 0;
+  setInterval(function() {
+      socket.emit('list', {text: 'List item ' + counter++});
+  }, 2500);
+
 });

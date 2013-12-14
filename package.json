@@ -15,6 +15,7 @@
     "passport-local": "*",
     "passport": "*",
     "passport-instagram": "*",
-    "passport-twitter": "*"
+    "passport-twitter": "*",
+    "socket.io": "~0.9.16"
   }
 }

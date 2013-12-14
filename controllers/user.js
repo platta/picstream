@@ -1,5 +1,5 @@
 module.exports.index = function(req, res) {
-  res.render('user/index', {title: 'Picstream', user: req.user}); 
+  res.render('user/index', {user: req.user}); 
 }
 
 module.exports.forgetTwitter = function(req, res) {
