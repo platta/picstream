@@ -1,6 +1,6 @@
 
 /**
- * Module dependencies.
+ * Module Dependencies
  */
 var express = require('express');
 var http = require('http');
@@ -11,21 +11,26 @@ var passport = require('passport'),
   LocalStrategy = require('passport-local').Strategy,
   TwitterStrategy = require('passport-twitter').Strategy,
   InstagramStrategy = require('passport-instagram').Strategy;
-
-
 var nconf = require('nconf');
+
+/**
+ * Load Configuration Values
+ * If on Azure we will take from environment variables which are populated based on the
+ * App Settings.  If running locally, we will provide the configuration values in a
+ * config.json file.
+ */
 nconf.env().file({file: 'config.json'});
 
 var config = {};
 config.title = nconf.get("TITLE");
+config.root_url = nconf.get("ROOT_URL");
+config.twitter = {};
+config.instagram = {};
 
 // Load credentials for connecting to azure storage
 config.storage_account = nconf.get("STORAGE_ACCOUNT");
 config.storage_key = nconf.get("STORAGE_KEY");
 config.partition_key = nconf.get("PARTITION_KEY");
-config.root_url = nconf.get("ROOT_URL");
-config.twitter = {};
-config.instagram = {};
 
 // Create TableService instance
 var storageInfo = {
@@ -37,18 +42,7 @@ var storageInfo = {
 var User = new (require('./models/user'))(storageInfo);
 var Setting = new(require('./models/setting'))(storageInfo);
 
-// Used this code to create settings in the first place.
-/*var newSetting = {
-  key: 'InstagramClientSecret',
-  value: ''
-};
-
-Setting.insertItem(newSetting, function(err) {
-  if (err) {
-    throw err;
-  }
-});*/
-
+// Load Twitter consumer key and secret and set up the Passport Twitter strategy
 Setting.getByKey('TwitterConsumerKey', function(err, setting) {
   if (err) {
     throw err;
@@ -84,6 +78,7 @@ Setting.getByKey('TwitterConsumerKey', function(err, setting) {
 });
 
 
+// Load Instagram client id and secret and set up Passport Instagram strategy
 Setting.getByKey('InstagramClientId', function(err, setting) {
   if (err) {
     throw err;
@@ -119,32 +114,6 @@ Setting.getByKey('InstagramClientId', function(err, setting) {
 });
 
 
-
-
-// Code to create password hash for a user.
-User.findByUsername('keyboardg', function(err, user) {
-  if (err) {
-    throw err;
-  } else {
-    user = user[0];
-    user.password = 'foobar';
-    user.passwordSalt = crypto.randomBytes(128).toString('base64');
-    crypto.pbkdf2(user.password, user.passwordSalt, 10000, 512, function(err, derivedKey) {
-      if (err) {
-        throw err;
-      } else {
-        user.password = derivedKey.toString('base64');
-        
-        User.updateItem(user, function(err) {
-          if (err) {
-            throw err;
-          }
-        });
-      }
-    });
-  }
-});
-
 // Helper function to pass in the request chain to restrict to authenticated users.
 function mustBeLoggedIn(req, res, next) {
   if (req.user) {
@@ -154,6 +123,7 @@ function mustBeLoggedIn(req, res, next) {
   }
 }
 
+// Local Passport strategy for user login
 passport.use(new LocalStrategy(function(username, password, callback) {
   User.findByUsername(username, function(err, user) {
     if (err) {
@@ -179,6 +149,22 @@ passport.use(new LocalStrategy(function(username, password, callback) {
   });
 }));
 
+// Use a hash to store user details to prevent constant hits to azure storage.
+// Not sure how big a problem it would be to let the actual requests go through
+// every time, but this works on a small scale.
+var userHash = {};
+passport.serializeUser(function(user, callback) {
+  userHash[user.RowKey] = user;
+  callback(null, user.RowKey);
+});
+
+passport.deserializeUser(function(id, callback) {
+  if (userHash[id]) {
+    callback(null, userHash[id]);
+  } else {
+    done(null, false);
+  }
+});
 
 
 var app = express();
@@ -262,22 +248,4 @@ app.post('/connect/instagram/remove', mustBeLoggedIn, function(req, res) {
  */
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
-});
-
-
-// Use a hash to store user details to prevent constant hits to azure storage.
-// Not sure how big a problem it would be to let the actual requests go through
-// every time, but this works on a small scale.
-var userHash = {};
-passport.serializeUser(function(user, callback) {
-  userHash[user.RowKey] = user;
-  callback(null, user.RowKey);
-});
-
-passport.deserializeUser(function(id, callback) {
-  if (userHash[id]) {
-    callback(null, userHash[id]);
-  } else {
-    done(null, false);
-  }
 });
