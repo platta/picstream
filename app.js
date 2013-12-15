@@ -1,4 +1,3 @@
-
 /**
  * Module Dependencies
  */
@@ -6,7 +5,6 @@ var express = require('express');
 var http = require('http');
 var path = require('path');
 var azure = require('azure');
-var crypto = require('crypto');
 var passport = require('passport'),
   LocalStrategy = require('passport-local').Strategy,
   TwitterStrategy = require('passport-twitter').Strategy,
@@ -14,161 +12,44 @@ var passport = require('passport'),
 var nconf = require('nconf');
 var io = require('socket.io');
 
+// Helper libraries
+var twitterLib = require('./lib/twitter');
+var instagramLib = require('./lib/instagram');
+var passportLib = require('./lib/passport');
+
+
 /**
  * Load Configuration Values
  * If on Azure we will take from environment variables which are populated based on the
  * App Settings.  If running locally, we will provide the configuration values in a
  * config.json file.
  */
+ 
 nconf.env().file({file: 'config.json'});
 
 var config = {};
 config.title = nconf.get("TITLE");
 config.root_url = nconf.get("ROOT_URL");
-config.twitter = {};
-config.instagram = {};
+config.cookie_secret = nconf.get("COOKIE_SECRET");
 
 // Load credentials for connecting to azure storage
 config.storage_account = nconf.get("STORAGE_ACCOUNT");
 config.storage_key = nconf.get("STORAGE_KEY");
 config.partition_key = nconf.get("PARTITION_KEY");
 
-// Create TableService instance
-var storageInfo = {
-  tableService: azure.createTableService(config.storage_account, config.storage_key),
-  partitionKey: config.partition_key
-}
 
-// Load entities
-var User = new (require('./models/user'))(storageInfo);
-var Setting = new(require('./models/setting'))(storageInfo);
-
-// Load Twitter consumer key and secret and set up the Passport Twitter strategy
-Setting.getByKey('TwitterConsumerKey', function(err, setting) {
-  if (err) {
-    throw err;
-  } else {
-    config.twitter.consumerKey = setting.value;
-    
-    Setting.getByKey('TwitterConsumerSecret', function(err, setting) {
-      if (err) {
-        throw err;
-      } else {
-        config.twitter.consumerSecret = setting.value;
-    
-        passport.use('twitter-auth', new TwitterStrategy({
-          consumerKey: config.twitter.consumerKey,
-          consumerSecret: config.twitter.consumerSecret,
-          callbackURL: config.root_url + '/connect/twitter/callback',
-          passReqToCallback: true
-        },
-        function(req, token, tokenSecret, profile, done) {
-          req.user.twitterToken = token;
-          req.user.twitterTokenSecret = tokenSecret;
-          User.updateItem(req.user, function(err) {
-            if (err) {
-              done(err);
-            } else {
-              done(null, false);
-            }
-          });
-        }));
-      }
-    });
-  }
-});
-
-
-// Load Instagram client id and secret and set up Passport Instagram strategy
-Setting.getByKey('InstagramClientId', function(err, setting) {
-  if (err) {
-    throw err;
-  } else {
-    config.instagram.clientId = setting.value;
-    
-    Setting.getByKey('InstagramClientSecret', function(err, setting) {
-      if (err) {
-        throw err;
-      } else {
-        config.instagram.clientSecret = setting.value;
-        
-        passport.use('instagram-auth', new InstagramStrategy({
-          clientID: config.instagram.clientId,
-          clientSecret: config.instagram.clientSecret,
-          callbackURL: config.root_url + '/connect/instagram/callback',
-          passReqToCallback: true
-        },
-        function(req, accessToken, refreshToken, profile, done) {
-          console.log(accessToken);
-          req.user.instagramAccessToken = accessToken;
-          User.updateItem(req.user, function(err) {
-            if (err) {
-              done(err);
-            } else {
-              done(null, false);
-            }
-          });
-        }));
-      }
-    });
-  }
-});
-
-
-// Helper function to pass in the request chain to restrict to authenticated users.
-function mustBeLoggedIn(req, res, next) {
-  if (req.user) {
-    next();
-  } else {
-    res.redirect('/login');
-  }
-}
-
-// Local Passport strategy for user login
-passport.use(new LocalStrategy(function(username, password, callback) {
-  User.findByUsername(username, function(err, user) {
-    if (err) {
-      return callback(err);
-    } else {
-      if (user.length > 0) {
-        user = user[0];
-        crypto.pbkdf2(password, user.passwordSalt, 10000, 512, function(err, derivedKey) {
-          if (err) {
-            callback(err);
-          } else {
-            if (user.password === derivedKey.toString('base64')) {
-              return callback(null, user);
-            } else {
-              return callback(null, false, {message: 'Invalid username or password.'});
-            }
-          }
-        });
-      } else {
-        return callback(null, false, {message: 'Invalid username or password.'});
-      }
-    }
-  });
-}));
-
-// Use a hash to store user details to prevent constant hits to azure storage.
-// Not sure how big a problem it would be to let the actual requests go through
-// every time, but this works on a small scale.
-var userHash = {};
-passport.serializeUser(function(user, callback) {
-  userHash[user.RowKey] = user;
-  callback(null, user.RowKey);
-});
-
-passport.deserializeUser(function(id, callback) {
-  if (userHash[id]) {
-    callback(null, userHash[id]);
-  } else {
-    done(null, false);
-  }
-});
-
-
+/**
+ * Create and configure Express app object
+ */
+ 
 var app = express();
+
+// Instantiate the session store manually so that we can get session info out of it
+var MemoryStore = express.session.MemoryStore;
+var sessionStore = new MemoryStore();
+
+// Instantiate our own cookie parser so that we can use it manually for socket.io
+var parseCookie = express.cookieParser(config.cookie_secret);
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -179,92 +60,143 @@ app.use(express.logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded());
 app.use(express.methodOverride());
-app.use(express.cookieParser('your secret here'));
-app.use(express.session()); // TODO: Default session provider gives a memory leak warning - look into using something else for Azure/Production
+app.use(parseCookie);
+
+// TODO: Default session provider gives a memory leak warning - look into using something
+// else for Azure/Production
+app.use(express.session({
+  store: sessionStore,
+  secret: config.cookie_secret,
+  key: 'connect.sid'
+}));
+
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(app.router);
 app.use(require('less-middleware')({ src: path.join(__dirname, 'public') }));
-app.use(express.static(path.join(__dirname, 'public')));
 
-// Load data into locals so all Jade templates can use it
-app.locals.config = config;
+ // TODO: Check where this belongs in the middleware stack.  Read something about passport
+ // deserializing user for every request because of bad order.
+app.use(express.static(path.join(__dirname, 'public')));
 
 // development only
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
 
-// Load Controllers
+// Load data into app.locals so all Jade templates can use it
+app.locals.config = config;
+
+
+/**
+ * Instantiate entities so we can retrieve data from the database.
+ */
+ 
+// Create TableService instance
+var storageInfo = {
+  tableService: azure.createTableService(config.storage_account, config.storage_key),
+  partitionKey: config.partition_key
+}
+
+// Load entities
+var User = new (require('./models/user'))(storageInfo);
+var Setting = new(require('./models/setting'))(storageInfo);
+
+// Store references in app.locals
+app.locals.entities = {};
+app.locals.entities.User = User;
+app.locals.entities.Setting = Setting;
+
+
+/**
+ * Configure Passport - this is for site login as well as OAuth calls to social media
+ * sites.
+ */
+
+// Local strategy
+passport.use(new LocalStrategy(passportLib.loginFunction(User)));
+passport.serializeUser(passportLib.serializeUser);
+passport.deserializeUser(passportLib.deserializeUser);
+
+// Twitter keys/strategy
+twitterLib.getKeys(Setting, function(err, data) {
+  if (err) {
+    throw err;
+  } else {
+    config.twitter = data;
+    passport.use('twitter-auth', twitterLib.PassportStrategy(User, config));
+  }
+});
+
+// Instagram keys/strategy
+instagramLib.getKeys(Setting, function(err, data) {
+  if (err) {
+    throw err;
+  } else {
+    config.instagram = data;
+    passport.use('instagram-auth', instagramLib.PassportStrategy(User, config));
+  }
+});
+
+
+/**
+ * Load Controllers
+ */
 var controllers = require('./controllers');
+
 
 /**
  * Load Routes
  */
-app.get('/', controllers.home.index);
-app.get('/login', controllers.home.login);
-app.post('/login', passport.authenticate('local', {
-  successRedirect: '/user',
-  failureRedirect: '/login'
-}));
-  
-app.get('/logout', function(req, res) {
-  req.logout();
-  req.user = null;
-  res.redirect('/');
-});
+require('./routes')(app);
 
-app.get('/user', mustBeLoggedIn, controllers.user.index);
-
-app.get('/connect/twitter', mustBeLoggedIn, passport.authorize('twitter-auth', {failureRedirect: '/user'}));
-app.get('/connect/twitter/callback', mustBeLoggedIn, passport.authorize('twitter-auth', {failureRedirect: '/user'}));
-
-app.post('/connect/twitter/remove', mustBeLoggedIn, function(req, res) {
-  if (req.user) {
-    req.user.twitterToken = null;
-    req.user.twitterTokenSecret = null;
-    User.updateItem(req.user, function(err) {
-      if (err) {
-        throw err;
-      }
-    });
-    res.redirect('/user');
-  }
-});
-
-app.get('/connect/instagram', mustBeLoggedIn, passport.authorize('instagram-auth', {failureRedirect: '/user'}));
-app.get('/connect/instagram/callback', mustBeLoggedIn, passport.authorize('instagram-auth', {failureRedirect: '/user'}));
-
-app.post('/connect/instagram/remove', mustBeLoggedIn, function(req, res) {
-  if (req.user) {
-    req.user.instagramAccessToken = null;
-    User.updateItem(req.user, function(err) {
-      if (err) {
-        throw err;
-      }
-    });
-    res.redirect('/user');
-  }
-});
-
-app.get('/socketio-test', mustBeLoggedIn, controllers.socketio.index);
 
 /**
  * Start server
  */
 var server = http.createServer(app);
+
+// Attach socket.io
 io = io.listen(server);
 server.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
 
+
 /**
  * Socket.io logic
  */
+ 
+ // TODO: Write io.set('authorization' ...); function.
+ 
 io.sockets.on('connection', function(socket) {
+  console.log(socket.handshake.headers);
+  
   var counter = 0;
   setInterval(function() {
       socket.emit('list', {text: 'List item ' + counter++});
   }, 2500);
-
+  
+  parseCookie(socket.handshake, null, function(err) {
+    if (err) {
+      console.log('Error');
+      console.log(err);
+    } else {
+      console.log('yay!');
+      console.log(socket.handshake.signedCookies);
+      sessionStore.get(socket.handshake.signedCookies['connect.sid'], function(err, s) {
+        if (err) {
+          console.log('error getting session');
+          console.log(err);
+        } else {
+          console.log('yay again');
+          console.log(s);
+          
+          passportLib.deserializeUser(s.passport.user, function(err, user) {
+            console.log(user.username);
+          });
+        }
+      });
+    }
+  });  
 });
