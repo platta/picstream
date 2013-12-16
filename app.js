@@ -24,7 +24,6 @@ var passportLib = require('./lib/passport');
  * App Settings.  If running locally, we will provide the configuration values in a
  * config.json file.
  */
- 
 nconf.env().file({file: 'config.json'});
 
 var config = {};
@@ -41,7 +40,6 @@ config.partition_key = nconf.get("PARTITION_KEY");
 /**
  * Create and configure Express app object
  */
- 
 var app = express();
 
 // Instantiate the session store manually so that we can get session info out of it
@@ -75,8 +73,8 @@ app.use(passport.session());
 app.use(app.router);
 app.use(require('less-middleware')({ src: path.join(__dirname, 'public') }));
 
- // TODO: Check where this belongs in the middleware stack.  Read something about passport
- // deserializing user for every request because of bad order.
+// TODO: Check where this belongs in the middleware stack.  Read something about passport
+// deserializing user for every request because of bad order.
 app.use(express.static(path.join(__dirname, 'public')));
 
 // development only
@@ -167,36 +165,67 @@ server.listen(app.get('port'), function(){
  * Socket.io logic
  */
  
- // TODO: Write io.set('authorization' ...); function.
+/**
+ * Socket.io logic
+ */
+
+io.configure(function() {
+  io.set('authorization', function(handshake, callback) {
+    parseCookie(handshake, null, function(err) {
+      if (err) {
+        callback(err);
+      } else {
+        sessionStore.get(handshake.signedCookies['connect.sid'], function(err, session) {
+          if (err) {
+            callback(err);
+          } else {
+            if (!session || !session.passport || !session.passport.user) {
+              callback(null, false);
+            } else {
+              passportLib.deserializeUser(session.passport.user, function(err, user) {
+                if (err) {
+                  callback(err);
+                } else {
+                  if (user) {
+                    // Tack the full user onto the handshake object so that the socket
+                    // code can access it.
+                    handshake.user = user;
+                    callback(null, true);
+                  } else {
+                    callback(null, false);
+                  }
+                }
+              });
+            }
+          }
+        });
+      }
+    });
+  });
+});
  
-io.sockets.on('connection', function(socket) {
-  console.log(socket.handshake.headers);
+ 
+io.sockets.on('connection', function(socket) {  
+  // Create a variable here to let us reference the stream so we can close it later.
+  var stream;
   
-  var counter = 0;
-  setInterval(function() {
-      socket.emit('list', {text: 'List item ' + counter++});
-  }, 2500);
+  // The authorization code will place the user in socket.handshake.user
+  var tweeter = twitterLib.apiObject(app.locals.config.twitter.consumerKey,
+    app.locals.config.twitter.consumerSecret,
+    socket.handshake.user.twitterToken,
+    socket.handshake.user.twitterTokenSecret);
   
-  parseCookie(socket.handshake, null, function(err) {
-    if (err) {
-      console.log('Error');
-      console.log(err);
-    } else {
-      console.log('yay!');
-      console.log(socket.handshake.signedCookies);
-      sessionStore.get(socket.handshake.signedCookies['connect.sid'], function(err, s) {
-        if (err) {
-          console.log('error getting session');
-          console.log(err);
-        } else {
-          console.log('yay again');
-          console.log(s);
-          
-          passportLib.deserializeUser(s.passport.user, function(err, user) {
-            console.log(user.username);
-          });
-        }
-      });
+  tweeter.stream('statuses/sample', function(s) {
+    stream = s;
+    stream.on('data', function(tweet) {
+      console.log(tweet.text);
+      socket.emit('list', {text: tweet.text});
+    });
+  });
+  
+  socket.on('disconnect', function() {
+    if (stream) {
+      stream.destroy();
     }
-  });  
+  });
 });

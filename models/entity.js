@@ -1,13 +1,20 @@
+/**
+ * Base class for interacting with Azure Table Services
+ */
+ 
 var azure = require('azure'),
   uuid = require('node-uuid');
-  
+
+// Entity is a class designed to be subclassed for specific tables. 
 module.exports = Entity
 
 function Entity(storageInfo) {
+  // The TableService object is created using the azure storage account name and key
   this.tableService = storageInfo.tableService;
   this.partitionKey = storageInfo.partitionKey;
 
   if (this.tableName) {
+    // Ensure the table exists.
     this.tableService.createTableIfNotExists(this.tableName,
       function (err) {
         if (err) {
@@ -18,6 +25,7 @@ function Entity(storageInfo) {
 }
 
 Entity.prototype = {
+  // Subclasses must set this value
   tableName: null,
   
   // Search by query, return multiple.
@@ -63,6 +71,7 @@ Entity.prototype = {
       });
   },
 
+  // Insert new item
   insertItem: function(item, callback) {
     var self = this;
     item.RowKey = uuid();
@@ -77,6 +86,7 @@ Entity.prototype = {
       });
   },
 
+  // Update existing item
   updateItem: function(item, callback) {
     var self = this;
     self.tableService.updateEntity(self.tableName, item, function(err) {
@@ -88,6 +98,7 @@ Entity.prototype = {
     });
   },
   
+  // Delete existing item
   deleteItem: function(item, callback) {
     var self = this;
     self.tableService.deleteEntity(self.tableName, item, function (err) {

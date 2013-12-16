@@ -49,5 +49,5 @@ module.exports = function(app) {
    * Socket.io Controller
    */
  
-  app.get('/socketio-test', mustBeLoggedIn, controllers.socketio.index);
+  app.get('/socketio-test', controllers.socketio.index);
 }
