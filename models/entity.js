@@ -8,10 +8,10 @@ var azure = require('azure'),
 // Entity is a class designed to be subclassed for specific tables. 
 module.exports = Entity
 
-function Entity(storageInfo) {
+function Entity(storageLink) {
   // The TableService object is created using the azure storage account name and key
-  this.tableService = storageInfo.tableService;
-  this.partitionKey = storageInfo.partitionKey;
+  this.tableService = storageLink.tableService;
+  this.partitionKey = storageLink.partitionKey;
 
   if (this.tableName) {
     // Ensure the table exists.

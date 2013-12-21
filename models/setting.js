@@ -1,9 +1,9 @@
 var Entity = require('./entity');
+var config = require('../lib/config');
+var azure = require('azure');
 
-module.exports = Setting;
-
-function Setting(storageInfo) {
-  Entity.call(this, storageInfo);
+function Setting(storageLink) {
+  Entity.call(this, storageLink);
 }
 
 Setting.prototype = Object.create(Entity.prototype);
@@ -25,3 +25,21 @@ Setting.prototype.getByKey = function(key, callback) {
     }
   });
 }
+
+// Retrieve all records
+Setting.prototype.getAll = function(callback) {
+  var self = this;
+  var query = azure.TableQuery
+    .select()
+    .from(self.tableName);
+    
+  self.find(query, function (err, items) {
+    if (err) {
+      callback(err);
+    } else {
+      callback(null, items);
+    }
+  });
+}
+
+module.exports = new Setting(config.storage_link);

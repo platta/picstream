@@ -1,9 +1,9 @@
 var Entity = require('./entity');
+var config = require('../lib/config');
 
-module.exports = User;
 
-function User(storageInfo) {
-  Entity.call(this, storageInfo);
+function User(storageLink) {
+  Entity.call(this, storageLink);
 }
 
 User.prototype = Object.create(Entity.prototype);
@@ -16,3 +16,5 @@ User.prototype.findByUsername = function(username, callback) {
   var self = this;
   self.findByField('username', username, callback);
 }
+
+module.exports = new User(config.storage_link);

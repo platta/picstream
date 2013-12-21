@@ -17,5 +17,6 @@
     "passport-instagram": "*",
     "passport-twitter": "*",
     "socket.io": "~0.9.16",
+    "instagram-node-lib": "~0.1.1"
   }
 }

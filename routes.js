@@ -50,4 +50,11 @@ module.exports = function(app) {
    */
  
   app.get('/socketio-test', controllers.socketio.index);
+  
+  
+  /**
+   * Instagram
+   */
+   app.get('/subscriptions/instagram', controllers.instagram.callback);
+   app.post('/subscriptions/instagram', controllers.instagram.incoming);
 }
