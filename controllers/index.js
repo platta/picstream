@@ -8,3 +8,4 @@ module.exports.home = require('./home');
 module.exports.user = require('./user');
 module.exports.socketio = require('./socketio');
 module.exports.instagram = require('./instagram');
+module.exports.stream = require('./stream');

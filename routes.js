@@ -46,6 +46,12 @@ module.exports = function(app) {
 
 
   /**
+   * Stream controller
+   */
+   
+   app.get('/stream', controllers.stream.index);
+
+  /**
    * Socket.io Controller
    */
  

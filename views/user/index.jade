@@ -38,3 +38,11 @@ block content
           td
             form(action="/connect/instagram", method="get")
               button.btn.btn-default.btn-xs(type="submit") Connect
+  
+  div.well
+    form(method="get", action="/stream")
+      div.form-group
+        label(for="keyword") Keyword:
+        input.form-control(type="text", name="keyword", placeholder="keyword")
+      div.form-group
+        button.btn.btn-primary(type="submit", name="submit") Stream
