@@ -1,4 +1,7 @@
 $(function() {
+  var carousel = $('#carousel').dynamicCarousel({slideDuration: 5000, transition: 'kenburns'}).data('dynamicCarousel');
+  carousel.start();
+  
   var params = parseGetParameters();
   
   if (params.keyword) {
@@ -6,11 +9,11 @@ $(function() {
     var socket = io.connect(rootUrl);
     
     socket.on('new-image', function(data) {
-      $('#growing-list').append('<li><strong>' + data.service + '</strong> - <img src="' + data.url + '" /></li>');
-    
-      if ($('#growing-list > li').size() > 50) {
-        $('#growing-list > li:first-child').remove();
-      }
+      var image = new Image();
+      image.src = data.url;
+      image.className = 'slide';
+      
+      carousel.addSlide(image);
     });
     
     socket.emit('start', {keyword: params.keyword});
