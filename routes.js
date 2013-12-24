@@ -49,13 +49,13 @@ module.exports = function(app) {
    * Stream controller
    */
    
-   app.get('/stream', controllers.stream.index);
+   app.get('/stream', mustBeLoggedIn, controllers.stream.index);
 
   /**
    * Socket.io Controller
    */
  
-  app.get('/socketio-test', controllers.socketio.index);
+  app.get('/socketio-test', mustBeLoggedIn, controllers.socketio.index);
   
   
   /**
