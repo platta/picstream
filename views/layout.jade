@@ -1,4 +1,4 @@
-doctype 5
+doctype html
 html
   head
     title= config.title
@@ -25,7 +25,7 @@ html
                 button.btn.btn-default(type="submit") Logout
               p.navbar-text.navbar-right Logged in as 
                 a(href="/user") #{user.username}
-                .
+                |.
             else
               form.navbar-form.navbar-right(action="/login", method="post")
                 div.form-group
