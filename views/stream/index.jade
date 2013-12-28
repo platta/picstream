@@ -4,6 +4,36 @@ block css
   link(rel="stylesheet", href="/css/stream.css")
 
 block content
+  #debug_area.well.pull-right.col-xs-4
+    div.form-group
+      label Current Image
+      #debug_image_frame.form-group
+        img#debug_image
+
+    div.form-group
+      label Created Date and Time
+      output#debug_created
+
+    div.form-group
+      label Service
+      output#debug_service
+  
+    div.form-group
+      label User
+      table
+        tbody
+          tr
+            td(rowspan=2)
+              img#debug_userprofile
+            td
+              output#debug_name
+          tr
+            td
+              output#debug_username
+
+    div.form-group
+      label Text
+      output#debug_text
   #carousel
   
 block scripts

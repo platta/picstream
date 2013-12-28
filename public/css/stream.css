@@ -4,10 +4,39 @@
   height: 480px;
   overflow: hidden;
   border: 1px solid black;
-  background-color: blue;
+  background-color: #ffffff;
+  background-image: -moz-linear-gradient(45deg, #888888, 25%, transparent, 25%), -moz-linear-gradient(-45deg, #888888, 25%, transparent, 25%), -moz-linear-gradient(45deg, transparent, 75%, #888888, 75%), -moz-linear-gradient(-45deg, transparent, 75%, #888888, 75%);
+  background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.25, #888888), color-stop(0.25, transparent)), -webkit-gradient(linear, 0 0, 100% 100%, color-stop(0.25, #888888), color-stop(0.25, transparent)), -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.75, transparent), color-stop(0.75, #888888)), -webkit-gradient(linear, 0 0, 100% 100%, color-stop(0.75, transparent), color-stop(0.75, #888888));
+  -moz-background-size: 18px 18px;
+  background-size: 18px 18px;
+  -webkit-background-size: 18px 18px;
+  background-position: 0 0, 9px 0, 9px -9px, 0px 9px;
 }
 .slide {
   position: absolute;
   top: 0px;
   left: 0px;
+}
+#debug_area #debug_userprofile {
+  height: 96px;
+}
+#debug_area #debug_image_frame {
+  border: 1px solid black;
+  height: 250px;
+  width: 250px;
+  overflow: hidden;
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+  background-color: #ffffff;
+  background-image: -moz-linear-gradient(45deg, #888888, 25%, transparent, 25%), -moz-linear-gradient(-45deg, #888888, 25%, transparent, 25%), -moz-linear-gradient(45deg, transparent, 75%, #888888, 75%), -moz-linear-gradient(-45deg, transparent, 75%, #888888, 75%);
+  background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.25, #888888), color-stop(0.25, transparent)), -webkit-gradient(linear, 0 0, 100% 100%, color-stop(0.25, #888888), color-stop(0.25, transparent)), -webkit-gradient(linear, 0 100%, 100% 0, color-stop(0.75, transparent), color-stop(0.75, #888888)), -webkit-gradient(linear, 0 0, 100% 100%, color-stop(0.75, transparent), color-stop(0.75, #888888));
+  -moz-background-size: 18px 18px;
+  background-size: 18px 18px;
+  -webkit-background-size: 18px 18px;
+  background-position: 0 0, 9px 0, 9px -9px, 0px 9px;
+}
+#debug_area #debug_image_frame #debug_image {
+  margin-left: auto;
+  margin-right: auto;
 }

@@ -4,11 +4,58 @@
   height: 480px;
   overflow: hidden;
   border: 1px solid black;
-  background-color: blue;
+  
+  .grid-background;
 }
 
 .slide {
   position: absolute;
   top: 0px;
   left: 0px;
+}
+
+#debug_area {
+  //width: 300px;
+
+  #debug_userprofile {
+    height: 96px;
+  }
+  
+  #debug_image_frame {
+    border: 1px solid black;
+    height: 250px;
+    width: 250px;
+    overflow: hidden;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+
+    .grid-background;
+    
+    #debug_image {
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+}
+
+.grid-background(@grid_size: 18px, @grid_forecolor: #888, @grid_backcolor: #fff) {
+  background-color: @grid_backcolor;
+  
+  background-image:
+    -moz-linear-gradient(45deg, @grid_forecolor, 25%, transparent, 25%), 
+    -moz-linear-gradient(-45deg, @grid_forecolor, 25%, transparent, 25%),
+    -moz-linear-gradient(45deg, transparent, 75%, @grid_forecolor, 75%),
+    -moz-linear-gradient(-45deg, transparent, 75%, @grid_forecolor, 75%);
+  background-image:
+    -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, @grid_forecolor), color-stop(.25, transparent)), 
+    -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, @grid_forecolor), color-stop(.25, transparent)),
+    -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.75, transparent), color-stop(.75, @grid_forecolor)),
+    -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.75, transparent), color-stop(.75, @grid_forecolor));
+
+  -moz-background-size: @grid_size @grid_size;
+  background-size: @grid_size @grid_size;
+  -webkit-background-size: @grid_size @grid_size;
+  
+  background-position:0 0, (@grid_size / 2) 0, (@grid_size / 2) -(@grid_size / 2), 0px (@grid_size / 2);
 }

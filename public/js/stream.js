@@ -1,5 +1,6 @@
 $(function() {
-  var carousel = $('#carousel').dynamicCarousel({slideDuration: 5000, transition: 'kenburns'}).data('dynamicCarousel');
+  var carousel = $('#carousel').dynamicCarousel({slideDuration: 5000, maxSlides: 3, transition: 'kenburns'}).data('dynamicCarousel');
+  carousel.debug = true;
   carousel.start();
   
   var params = parseGetParameters();
@@ -13,10 +14,12 @@ $(function() {
       image.src = data.url;
       image.className = 'slide';
       
+      $(image).data("metadata", data);
+            
       carousel.addSlide(image);
     });
     
-    socket.emit('start', {keyword: params.keyword});
+    socket.emit('start', {keyword: params.keyword, maxSlides: carousel.settings.maxSlides});
   } else {
     // No keyword passed in...
   }
