@@ -1,4 +1,18 @@
 extends ../layout
 
 block content
-  p Welcome to #{config.title}
+  div.jumbotron
+    div.container.text-right
+      h1 #{config.title}
+      p Live stream images from your favorite social media platforms.
+  
+  div.container
+    div.row
+        
+      div.col.col-md-6
+        h2 Connect
+        p Authorize #{config.title} to access content on social media platforms so that we can retrieve pictures.
+        
+      div.col.col-md-6
+        h2 Stream
+        p Enter a keyword to see a slideshow of images tagged with that keyword that updates in real time.
