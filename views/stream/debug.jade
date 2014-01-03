@@ -1,0 +1,55 @@
+extends ../layout
+
+block css
+  link(rel="stylesheet", href="/css/stream.css")
+  link(rel="stylesheet", href="/css/stream_debug.css")
+  
+block content
+  #carousel.col-12
+  
+  div.form-group
+  
+  #debug_area.panel.panel-default
+    div.panel-heading Debug Information
+  
+    div.panel-body
+      div.row
+        div.col-sm-6.text-center
+          label Current Image
+          #debug_image_frame_frame
+            #debug_image_frame
+              img#debug_image
+
+        div.col-sm-4.text-center
+          label Date and Time
+          output#debug_created
+
+        div.col-sm-2.text-center
+          label Service
+          output#debug_service
+
+      div.row
+        div.col-sm-4.text-center
+          label User
+          table
+            tbody
+              tr
+                td(rowspan=2)
+                  img#debug_userprofile
+                td
+                  output.text-left#debug_name
+              tr
+                td
+                  output.text-left#debug_username
+
+        div.col-8.text-center
+          label Text
+          output.text-left#debug_text
+  
+block scripts
+  script(type="text/javascript" src="/js/jquery.transit.min.js")
+  script(type="text/javascript" src="/js/jquery.dynamiccarousel.js")
+  script(type="text/javascript" src="/js/dynamiccarousel.kenburns.js")
+  script(type="text/javascript" src="/socket.io/socket.io.js")
+  script(type="text/javascript" src="/js/stream.js")
+  script(type="text/javascript" src="/js/stream_debug.js")

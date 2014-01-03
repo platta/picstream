@@ -1,44 +1,25 @@
-extends ../layout
+doctype html
+html
+  head
+    title= config.title
+    
+    link(rel='stylesheet', href='/bootstrap/css/bootstrap.min.css')
+    link(rel='stylesheet', href='/css/style.css')
+    link(rel="stylesheet", href="/css/stream.css")
+    link(rel="stylesheet", href="/css/stream_fullscreen.css")
+  body
+    input#root-url(type="hidden" value=config.root_url)
+    #nav_container
+      nav.navbar.navbar-default#main_nav(role="navigation")
+        a.btn.btn-primary.navbar-btn.navbar-right#done_button(href="/user") Done
 
-block css
-  link(rel="stylesheet", href="/css/stream.css")
-
-block content
-  #debug_area.well.pull-right.col-xs-4
-    div.form-group
-      label Current Image
-      #debug_image_frame.form-group
-        img#debug_image
-
-    div.form-group
-      label Created Date and Time
-      output#debug_created
-
-    div.form-group
-      label Service
-      output#debug_service
-  
-    div.form-group
-      label User
-      table
-        tbody
-          tr
-            td(rowspan=2)
-              img#debug_userprofile
-            td
-              output#debug_name
-          tr
-            td
-              output#debug_username
-
-    div.form-group
-      label Text
-      output#debug_text
-  #carousel
-  
-block scripts
-  script(type="text/javascript" src="/js/jquery.transit.min.js")
-  script(type="text/javascript" src="/js/jquery.dynamiccarousel.js")
-  script(type="text/javascript" src="/js/dynamiccarousel.kenburns.js")
-  script(type="text/javascript" src="/socket.io/socket.io.js")
-  script(type="text/javascript" src="/js/stream.js")
+    #carousel
+    
+    script(type='text/javascript', src='/js/jquery-1.10.2.min.js')
+    script(type='text/javascript', src='/bootstrap/js/bootstrap.min.js')
+    script(type="text/javascript" src="/js/jquery.transit.min.js")
+    script(type="text/javascript" src="/js/jquery.dynamiccarousel.js")
+    script(type="text/javascript" src="/js/dynamiccarousel.kenburns.js")
+    script(type="text/javascript" src="/socket.io/socket.io.js")
+    script(type="text/javascript" src="/js/stream.js")
+    script(type="text/javascript" src="/js/stream_fullscreen.js")

@@ -1,0 +1,17 @@
+#nav_container {
+  width: 100%;
+}
+#main_nav {
+  z-index: 10;
+  margin: 10px;
+}
+#done_button {
+  margin-right: 10px;
+}
+#carousel {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+}

@@ -1,6 +1,6 @@
 $(function() {
   var carousel = $('#carousel').dynamicCarousel({slideDuration: 5000, maxSlides: 3, transition: 'kenburns'}).data('dynamicCarousel');
-  carousel.debug = true;
+  //carousel.debug = true;
   carousel.start();
   
   var params = parseGetParameters();
