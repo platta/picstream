@@ -1,0 +1,57 @@
+extends ../layout
+
+block content
+  h1 Settings for #{user.username}
+  
+  h2 Social Media
+  
+  table.table
+    thead
+      tr
+        th Service
+        th Connected
+        th
+    tbody
+      tr
+        td Twitter
+        if user.twitterToken
+          td.success Connected
+          td
+            form(action="/connect/twitter/remove",  method="post")
+              button.btn.btn-default.btn-xs(type="submit") Disconnect
+        else
+          td.warning Not Connected
+          td
+            form(action="/connect/twitter", method="get")
+              button.btn.btn-default.btn-xs(type="submit") Connect
+      tr
+        td Instagram
+        if user.instagramAccessToken
+          td.success Connected
+          td
+            form(action="/connect/instagram/remove", method="post")
+              button.btn.btn-default.btn-xs(type="submit") Disconnect
+        else
+          td.warning Not Connected
+          td
+            form(action="/connect/instagram", method="get")
+              button.btn.btn-default.btn-xs(type="submit") Connect
+  
+  h2 Change Password
+  
+  div.col-sm-4
+    form(action="/user/change-password", method="post")
+      div.form-group
+        label(for="current_password") Current Password:
+        input.form-control(type="password", id="current_password")
+    
+      div.form-group
+        label(for="new_password") New Password:
+        input.form-control(type="password", id="new_password")
+        
+      div.form-group
+        input.form-control(type="password", id="new_password_repeat")
+      
+      div.form-group
+        button.btn.btn-primary(type="submit") Change Password
+    

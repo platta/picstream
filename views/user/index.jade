@@ -3,40 +3,6 @@ extends ../layout
 block content
   h1 Hello, #{user.username}
   
-  a(href="/stream/fullscreen") Fullscreen Stream Test
-  
-  table.table
-    thead
-      tr
-        th Service
-        th Connected
-        th
-    tbody
-      tr
-        td Twitter
-        if user.twitterToken
-          td.success Connected
-          td
-            form(action="/connect/twitter/remove",  method="post")
-              button.btn.btn-default.btn-xs(type="submit") Disconnect
-        else
-          td.warning Not Connected
-          td
-            form(action="/connect/twitter", method="get")
-              button.btn.btn-default.btn-xs(type="submit") Connect
-      tr
-        td Instagram
-        if user.instagramAccessToken
-          td.success Connected
-          td
-            form(action="/connect/instagram/remove", method="post")
-              button.btn.btn-default.btn-xs(type="submit") Disconnect
-        else
-          td.warning Not Connected
-          td
-            form(action="/connect/instagram", method="get")
-              button.btn.btn-default.btn-xs(type="submit") Connect
-  
   div.well
     form(method="get", action="/stream")
       div.form-group
@@ -46,3 +12,17 @@ block content
           span.input-group-btn
             button.btn.btn-primary(type="submit", name="destination", value="stream") Stream
             button.btn.btn-primary(type="submit", name="destination", value="debug") Debug
+      
+      div.form-group
+        label Services to Stream:
+        if user.twitterToken
+          div.checkbox
+            label
+              input(type="checkbox", checked, name="streamTwitter")
+              | Twitter
+        
+        if user.instagramAccessToken
+          div.checkbox
+            label
+              input(type="checkbox", checked, name="streamInstagram")
+              | Instagram

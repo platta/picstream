@@ -16,7 +16,10 @@ html
             span.icon-bar
             span.icon-bar
             span.icon-bar
-          a(class='navbar-brand' href='/')= config.title
+          if user
+            a(class='navbar-brand' href='/user')= config.title
+          else
+            a(class='navbar-brand' href='/')= config.title
         
         #navbar-collapse.collapse.navbar-collapse
           if !hideHeaderLogin
@@ -24,7 +27,7 @@ html
               form.navbar-form.navbar-right(action="/logout", method="get")
                 button.btn.btn-default(type="submit") Logout
               p.navbar-text.navbar-right Logged in as 
-                a(href="/user") #{user.username}
+                a(href="/user/settings") #{user.username}
                 |.
             else
               form.navbar-form.navbar-right(action="/login", method="post")

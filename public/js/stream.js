@@ -19,7 +19,12 @@ $(function() {
       carousel.addSlide(image);
     });
     
-    socket.emit('start', {keyword: params.keyword, maxSlides: carousel.settings.maxSlides});
+    socket.emit('start', {
+      keyword: params.keyword,
+      streamInstagram: params.streamInstagram,
+      streamTwitter: params.streamTwitter,
+      maxSlides: carousel.settings.maxSlides
+    });
   } else {
     // No keyword passed in...
   }

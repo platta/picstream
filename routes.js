@@ -33,6 +33,7 @@ module.exports = function(app) {
  
   // User page
   app.get('/user', mustBeLoggedIn, controllers.user.index);
+  app.get('/user/settings', mustBeLoggedIn, controllers.user.settings);
 
   // Twitter auth
   app.get('/connect/twitter', mustBeLoggedIn, passport.authorize('twitter-auth', {failureRedirect: '/user'}));
