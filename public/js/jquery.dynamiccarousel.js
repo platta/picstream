@@ -51,6 +51,7 @@
       if (currentSlide != nextSlide) {
         // Call transition
         this.animating = true;
+        nextSlide.data('visible', true);
         $.fn.dynamicCarousel.transitions[this.settings.transition].call(this, this.settings, this.transitionSettings, this.container, currentSlide, nextSlide);
         this.currentSlide = nextSlide;
         
@@ -102,11 +103,13 @@
     var addFunction = function() {
       if (element.complete) {
         var slide = $(element).hide();
+        slide.data('visible', false);
         self.container.append(slide);
         self.slides.push(slide);
-    
+
         if (self.settings.maxSlides > 0 && self.slides.length > self.settings.maxSlides) {
-          if (self.slideIndex > 1 || self.slideIndex > 0 && !self.animating || self.slides[0] !== self.currentSlide) {
+          //if (self.slideIndex > 1 || self.slideIndex > 0 && !self.animating || self.slides[0] !== self.currentSlide) {
+          if (!self.slides[0].data('visible')) {
             self.slides[0].remove();
           }
       
@@ -136,6 +139,7 @@
   DynamicCarousel.prototype.slideHidden = function(slide) {
     this.animating = false;
     this.setAtNewSlide = false;
+    slide.data('visible', false);
     if ($.inArray(slide, this.slides) === -1) {
       slide.remove();
     }
