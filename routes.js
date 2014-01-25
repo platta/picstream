@@ -50,7 +50,8 @@ module.exports = function(app) {
    * Stream controller
    */
    
-   app.get('/stream', mustBeLoggedIn, controllers.stream.index);
+   app.post('/stream/create', mustBeLoggedIn, controllers.stream.create);
+   app.get('/stream/attach/:streamId', mustBeLoggedIn, controllers.stream.attach);
 
   /**
    * Socket.io Controller

@@ -5,8 +5,9 @@ $(function() {
   
   var params = parseGetParameters();
   
-  if (params.keyword) {
+  if (true || params.keyword) {
     var rootUrl = $('#root-url').val();
+    var streamId = $('#stream-id').val();
     var socket = io.connect(rootUrl);
     
     socket.on('new-image', function(data) {
@@ -19,12 +20,20 @@ $(function() {
       carousel.addSlide(image);
     });
     
+    console.log('Browser Code: ' + streamId);
+    socket.emit('attach', streamId);
+    
+    $(window).unload(function() {
+      socket.emit('detach');
+    });
+    /*
     socket.emit('start', {
       keyword: params.keyword,
       streamInstagram: params.streamInstagram,
       streamTwitter: params.streamTwitter,
       maxSlides: carousel.settings.maxSlides
     });
+    */
   } else {
     // No keyword passed in...
   }

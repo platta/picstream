@@ -4,7 +4,7 @@ block content
   h1 Hello, #{user.username}
   
   div.well
-    form(method="get", action="/stream")
+    form(method="post", action="/stream/create")
       div.form-group
         label(for="keyword") Keyword:
         div.input-group
