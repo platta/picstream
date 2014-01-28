@@ -2,6 +2,8 @@ var passport = require('passport');
 var controllers = require('./controllers');
 var passportLib = require('./lib/passport');
 
+// Passing this function in the middleware chain will cause a redirect to the logon page
+// if the user is not logged in.
 var mustBeLoggedIn = passportLib.mustBeLoggedIn;
 
 module.exports = function(app) {
@@ -9,7 +11,6 @@ module.exports = function(app) {
   /**
    * Home Controller
    */
- 
   // Home page
   app.get('/', controllers.home.index);
 
@@ -19,22 +20,34 @@ module.exports = function(app) {
     successRedirect: '/user',
     failureRedirect: '/login'
   }));
-  
-  app.get('/logout', function(req, res) {
-    req.logout();
-    req.user = null;
-    res.redirect('/');
-  });
+  app.get('/logout', controllers.home.logout);
 
 
   /**
    * User Controller
    */
- 
   // User page
   app.get('/user', mustBeLoggedIn, controllers.user.index);
   app.get('/user/settings', mustBeLoggedIn, controllers.user.settings);
 
+
+  /**
+   * Stream controller
+   */
+   app.post('/stream/create', mustBeLoggedIn, controllers.stream.create);
+   app.get('/stream/attach/:streamId', mustBeLoggedIn, controllers.stream.attach);
+  
+  
+  /**
+   * Instagram
+   */
+   app.get('/subscriptions/instagram', controllers.instagram.callback);
+   app.post('/subscriptions/instagram', controllers.instagram.incoming);
+   
+   
+  /**
+   * Social media login handlers
+   */
   // Twitter auth
   app.get('/connect/twitter', mustBeLoggedIn, passport.authorize('twitter-auth', {failureRedirect: '/user'}));
   app.get('/connect/twitter/callback', mustBeLoggedIn, passport.authorize('twitter-auth', {failureRedirect: '/user'}));
@@ -44,25 +57,4 @@ module.exports = function(app) {
   app.get('/connect/instagram', mustBeLoggedIn, passport.authorize('instagram-auth', {failureRedirect: '/user'}));
   app.get('/connect/instagram/callback', mustBeLoggedIn, passport.authorize('instagram-auth', {failureRedirect: '/user'}));
   app.post('/connect/instagram/remove', mustBeLoggedIn, controllers.user.removeInstagram)
-
-
-  /**
-   * Stream controller
-   */
-   
-   app.post('/stream/create', mustBeLoggedIn, controllers.stream.create);
-   app.get('/stream/attach/:streamId', mustBeLoggedIn, controllers.stream.attach);
-
-  /**
-   * Socket.io Controller
-   */
- 
-  app.get('/socketio-test', mustBeLoggedIn, controllers.socketio.index);
-  
-  
-  /**
-   * Instagram
-   */
-   app.get('/subscriptions/instagram', controllers.instagram.callback);
-   app.post('/subscriptions/instagram', controllers.instagram.incoming);
 }

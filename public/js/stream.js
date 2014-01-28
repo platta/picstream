@@ -1,42 +1,37 @@
 $(function() {
   var carousel = $('#carousel').dynamicCarousel({slideDuration: 2000, maxSlides: 10, transition: 'kenburns'}).data('dynamicCarousel');
-  //carousel.debug = true;
   carousel.start();
   
   var params = parseGetParameters();
   
-  if (true || params.keyword) {
-    var rootUrl = $('#root-url').val();
-    var streamId = $('#stream-id').val();
-    var socket = io.connect(rootUrl);
+
+  var rootUrl = $('#root-url').val();
+  var streamId = $('#stream-id').val();
+  var socket = io.connect(rootUrl);
+  
+  socket.on('new-image', function(data) {
+    var image = new Image();
+    image.src = data.url;
+    image.className = 'slide';
     
-    socket.on('new-image', function(data) {
-      var image = new Image();
-      image.src = data.url;
-      image.className = 'slide';
-      
-      $(image).data("metadata", data);
-            
-      carousel.addSlide(image);
-    });
-    
-    console.log('Browser Code: ' + streamId);
-    socket.emit('attach', streamId);
-    
-    $(window).unload(function() {
-      socket.emit('detach');
-    });
-    /*
-    socket.emit('start', {
-      keyword: params.keyword,
-      streamInstagram: params.streamInstagram,
-      streamTwitter: params.streamTwitter,
-      maxSlides: carousel.settings.maxSlides
-    });
-    */
-  } else {
-    // No keyword passed in...
-  }
+    $(image).data("metadata", data);
+          
+    carousel.addSlide(image);
+  });
+  
+  // TODO: How do we record success or failure of this?
+  socket.on('reconnect', function() {
+    socket.emit('reconnect');
+  });
+
+  // TODO: How do we record success or failure of this?  
+  socket.emit('attach', streamId);
+  
+  // Issue a detach command when navigating away from the page so that the server doesn't
+  // think we have just dropped connection.
+  $(window).unload(function() {
+    socket.emit('detach');
+  });
 });
 
 
