@@ -6,10 +6,12 @@ $(function() {
   
 
   var rootUrl = $('#root-url').val();
+  console.log('rootUrl = ' + rootUrl);
   var streamId = $('#stream-id').val();
-  var socket = io.connect(rootUrl);
+  var socket = io.connect(null);
+  var wasConnected = false;
   
-  socket.on('new-image', function(data) {
+  socket.on('new-media', function(data) {
     var image = new Image();
     image.src = data.url;
     image.className = 'slide';
@@ -19,18 +21,57 @@ $(function() {
     carousel.addSlide(image);
   });
   
-  // TODO: How do we record success or failure of this?
+  socket.on('detach', function() {
+    toast('Detached from stream', 'danger');
+  });
+  /*
+  socket.on('attach-succeeded', function() {
+    toast('Attached to stream', 'success');
+  });
+  
+  socket.on('attach-failed', function() {
+    toast('Attach failed', 'danger');
+  });
+  */
+  
   socket.on('reconnect', function() {
-    socket.emit('reconnect');
+    toast('Reconnected to socket', 'success');
   });
 
-  // TODO: How do we record success or failure of this?  
-  socket.emit('attach', streamId);
+  socket.on('disconnect', function() {
+    toast('Disconnected from socket', 'danger');
+  });
+
+  socket.on('reconnecting', function() {
+    toast('Reconnecting to socket', 'info');
+  });
+
+  socket.on('connecting', function() {
+    toast('Connecting to socket', 'info');
+  });
+  
+  
+  socket.on('connect', function() {
+    toast('Connected to socket', 'info');
+    
+    console.log(socket.id);
+    
+    // Now that we're connected to the socket, attach to the stream.
+    socket.emit('attach', {streamId: streamId, reconnect: wasConnected}, function(err, data) {
+      if (data.attached) {
+        wasConnected = true;
+        toast('Attached to stream', 'success');
+      } else {
+        toast('Unable to attach to stream', 'danger');
+      }
+    });
+  });
+
   
   // Issue a detach command when navigating away from the page so that the server doesn't
   // think we have just dropped connection.
   $(window).unload(function() {
-    socket.emit('detach');
+    socket.emit('detach', {intentional: true});
   });
 });
 
@@ -46,4 +87,22 @@ function parseGetParameters() {
   });
   
   return params;
+}
+
+function toast(message, type) {
+  var div = document.createElement('div');
+  var $div = $(div);
+  
+  $div.addClass('alert')
+    .addClass('alert-' + type)
+    .text(message).hide();
+    
+  $('#toast_area').append($div);
+  $div.fadeIn();
+  
+  setTimeout(function() {
+    $div.fadeOut(function() {
+      $div.remove();
+    });
+  }, 3500);
 }

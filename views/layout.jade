@@ -7,7 +7,6 @@ html
     link(rel='stylesheet', href='/css/style.css')
     block css
   body
-    input#root-url(type="hidden" value=config.root_url)
     div.container
       nav.navbar.navbar-default(role='navigation')
         div.navbar-header
@@ -37,6 +36,7 @@ html
                   input.form-control(type="password", placeholder="Password", name="password")
                 button.btn.btn-default(type="submit") Login
       block content
+    block footer
     script(type='text/javascript', src='/js/jquery-1.10.2.min.js')
     script(type='text/javascript', src='/bootstrap/js/bootstrap.min.js')
     block scripts

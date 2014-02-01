@@ -36,6 +36,7 @@ module.exports = function(app) {
    */
    app.post('/stream/create', mustBeLoggedIn, controllers.stream.create);
    app.get('/stream/attach/:streamId', mustBeLoggedIn, controllers.stream.attach);
+   app.get('/stream/debug/:streamId', mustBeLoggedIn, controllers.stream.debug);
   
   
   /**

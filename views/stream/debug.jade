@@ -5,6 +5,8 @@ block css
   link(rel="stylesheet", href="/css/stream_debug.css")
   
 block content
+  input#stream-id(type="hidden" value=streamId)
+  input#root-url(type="hidden" value=config.root_url)
   #carousel.col-12
   
   div.form-group
@@ -45,6 +47,9 @@ block content
         div.col-8.text-center
           label Text
           output.text-left#debug_text
+
+block footer
+  #toast_area.col-sm-10.col-sm-offset-1
   
 block scripts
   script(type="text/javascript" src="/js/jquery.transit.min.js")

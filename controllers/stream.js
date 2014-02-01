@@ -16,13 +16,16 @@ module.exports.create = function(req, res) {
 
   if (settings.keyword && (settings.streamTwitter || settings.streamInstagram)) {  
     // Instantiate the StreamManager and start it.
-    console.log('Stream controller instantiating StreamManager');
     var manager = new StreamManager(req.user, settings);
     manager.start();
   
-    // Redirect the user to the attach url for the new Stream
-    console.log('Stream controller redirecting to attach handler');
-    res.redirect('/stream/attach/' + manager.uuid);
+    // Redirect the user to the appropriate attach url for the new Stream
+    var destination = req.body.destination;
+    if (destination === 'debug') {
+      res.redirect('/stream/debug/' + manager.uuid);
+    } else {
+      res.redirect('/stream/attach/' + manager.uuid);
+    }
   } else {
     res.redirect('/user');
   }
@@ -36,11 +39,22 @@ module.exports.attach = function(req, res) {
   // Check to see if the stream exists
   if (StreamManager.streams[streamId]) {
     // Stream exists.  Pass off to rendering.  The browser side code will handle the rest.
-    console.log('Attach handler attaching to: ' + streamId);
     res.render('stream/index', {user: req.user, streamId: streamId});
-    // TODO: Decide how to add functionality back to get to the debug stream.
   } else {
-    console.log('Attempt to attach to stream ' + streamId + ', which does not exist');
     res.render('stream/error', {user: req.user, streamId: streamId});
   }
 };
+
+
+// Render the debug page for a stream
+module.exports.debug = function(req, res) {
+  var streamId = req.params.streamId;
+  
+  // Check to see if the stream exists
+  if (StreamManager.streams[streamId]) {
+    // Stream exists.  Pass off to rendering.  The browser side code will handle the rest.
+    res.render('stream/debug', {user: req.user, streamId: streamId});
+  } else {
+    res.render('stream/error', {user: req.user, streamId: streamId});
+  }
+}

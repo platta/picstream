@@ -13,3 +13,8 @@
   top: 0px;
   left: 0px;
 }
+#toast_area {
+  position: fixed;
+  bottom: 0px;
+  z-index: 10;
+}
