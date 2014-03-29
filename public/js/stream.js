@@ -24,15 +24,6 @@ $(function() {
   socket.on('detach', function() {
     toast('Detached from stream', 'danger');
   });
-  /*
-  socket.on('attach-succeeded', function() {
-    toast('Attached to stream', 'success');
-  });
-  
-  socket.on('attach-failed', function() {
-    toast('Attach failed', 'danger');
-  });
-  */
   
   socket.on('reconnect', function() {
     toast('Reconnected to socket', 'success');
