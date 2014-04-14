@@ -1,5 +1,5 @@
 $(function() {
-  var carousel = $('#carousel').dynamicCarousel({slideDuration: 2000, maxSlides: 10, transition: 'kenburns'}).data('dynamicCarousel');
+  var carousel = $('#carousel').dynamicCarousel({slideDuration: 5000, maxSlides: 10, transition: 'kenburns'}).data('dynamicCarousel');
   carousel.start();
   
   var params = parseGetParameters();
