@@ -81,6 +81,7 @@ function parseGetParameters() {
 }
 
 function toast(message, type) {
+  /*
   var div = document.createElement('div');
   var $div = $(div);
   
@@ -96,4 +97,6 @@ function toast(message, type) {
       $div.remove();
     });
   }, 3500);
+  */
+  console.log(type + ": " + message);
 }
